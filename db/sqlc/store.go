@@ -57,45 +57,46 @@ type TransferTxResult struct {
 }
 
 // TransferTx performs a money transfer from one account to the other.
-// It creates a transfer record, and updates the account balances.
-// If any of the queries fail, the entire transaction fails.
-//func (store *Store) TransferTx(cxt context.Context, arg TransferTxParams) (TransferTxResult, error) {
-//	var result TransferTxResult
-//	err := store.execTx(cxt, func(q *Queries) error {
-//		var err error
-//		result.Transfer, err = q.CreateTransfer(cxt, CreateTransferParams{
-//			FromAccountID: arg.FromAccountID,
-//			ToAccountID:   arg.ToAccountID,
-//			Amount:        arg.Amount,
-//		})
-//		if err != nil {
-//			return err
-//		}
-//		// Update the account balance
-//		_, err = q.AddAccountBalance(cxt, AddAccountBalanceParams{
-//			AccountID: arg.FromAccountID,
-//			Amount:    -arg.Amount,
-//		})
-//		if err != nil {
-//			return err
-//		}
-//		_, err = q.AddAccountBalance(cxt, AddAccountBalanceParams{
-//			AccountID: arg.ToAccountID,
-//			Amount:    arg.Amount,
-//		})
-//		if err != nil {
-//			return err
-//		}
-//		// Get the updated account balance
-//		result.FromAccount, err = q.GetAccountForUpdate(cxt, arg.FromAccountID)
-//		if err != nil {
-//			return err
-//		}
-//		result.ToAccount, err = q.GetAccountForUpdate(cxt, arg.ToAccountID)
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//	})
-//	return result, err
-//}
+// It creates a transfer record, and account entries, and update accounts' balance within a single database transaction.
+
+func (store *Store) TransferTx(cxt context.Context, arg TransferTxParams) (TransferTxResult, error) {
+	var result TransferTxResult
+
+	err := store.execTx(cxt, func(q *Queries) error {
+		var err error
+
+		result.Transfer, err = q.CreateTransfer(cxt, CreateTransferParams{
+			FromAccountID: arg.FromAccountID,
+			ToAccountID:   arg.ToAccountID,
+			Amount:        arg.Amount,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		result.FromEntry, err = q.CreateEntry(cxt, CreateEntryParams{
+			AccountID: arg.FromAccountID,
+			Amount:    -arg.Amount,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		result.ToEntry, err = q.CreateEntry(cxt, CreateEntryParams{
+			AccountID: arg.ToAccountID,
+			Amount:    arg.Amount,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		// TODO: update accounts' balance based on the entry result
+
+		return nil
+	})
+
+	return result, err
+}
