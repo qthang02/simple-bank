@@ -40,14 +40,12 @@ func (store *Store) execTx(cxt context.Context, fn func(*Queries) error) error {
 	return tx.Commit()
 }
 
-// TransferTxParams
 type TransferTxParams struct {
 	FromAccountID int64 `json:"from_account_id"`
 	ToAccountID   int64 `json:"to_account_id"`
 	Amount        int64 `json:"amount"`
 }
 
-// TransferTxResult
 type TransferTxResult struct {
 	Transfer    Transfer `json:"transfer"`
 	FromAccount Account  `json:"from_account"`
