@@ -1,10 +1,12 @@
 package gapi
 
 import (
-	"google.golang.org/protobuf/types/known/timestamppb"
 	db "simple-bank/db/sqlc"
 	"simple-bank/pb"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
 
 func convertUser(user db.User) *pb.User {
 	return &pb.User{
