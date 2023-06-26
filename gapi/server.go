@@ -2,11 +2,13 @@ package gapi
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	db "simple-bank/db/sqlc"
 	"simple-bank/pb"
 	"simple-bank/token"
 	"simple-bank/util"
+	"simple-bank/worker"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
@@ -15,10 +17,11 @@ type Server struct {
 	store       db.Store
 	tokenMarker token.Maker
 	router      *gin.Engine
+	taskDistributor worker.TaskDistributor
 }
 
 // NewServer creates a new HTTP server and setup routing.
-func NewServer(config util.Config, store db.Store) (*Server, error) {
+func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	//tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -29,6 +32,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		config:      config,
 		store:       store,
 		tokenMarker: tokenMaker,
+		taskDistributor: taskDistributor,
 	}
 
 	return server, nil
