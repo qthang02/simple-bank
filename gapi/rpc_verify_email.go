@@ -35,7 +35,7 @@ func (server *Server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 
 func ValidateVerifyEmailRequest(req *pb.VerifyEmailRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateEmailId(req.GetEmailId()); err != nil {
-		violations = append(violations, fieldViolation("email", err))
+		violations = append(violations, fieldViolation("email_id", err))
 	}
 
 	if err := val.ValidatePassword(req.GetSecretCode()); err != nil {
