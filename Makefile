@@ -30,4 +30,6 @@ evans:
 	evans --host localhost --port 9090 -r repl
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
-.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlcmd test server mock proto evans redis
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 new_migration sqlcmd test server mock proto evans redis
