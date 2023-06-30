@@ -34,7 +34,7 @@ service SimpleBank {
 
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
      option (google.api.http) = {
-      post: "/v1/verify_email"
+      get: "/v1/verify_email"
     };
   }
 }
