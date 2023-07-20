@@ -33,30 +33,31 @@ func main() {
 	if err != nil {
 		log.Fatal().Msg("cannot load config:")
 	}
-	
+
 	if config.Environtment == "development" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	runDBMigration(config.MigrationURL, config.DBSource)
-	
+
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal().Msg("cannot connect to db:")
 	}
 
-
 	store := db.NewStore(conn)
 
-	redisOpt := asynq.RedisClientOpt{
-		Addr: config.RedisAddress,
-	}
+	//redisOpt := asynq.RedisClientOpt{
+	//	Addr: config.RedisAddress,
+	//}
 
-	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+	//taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 
-	go runTaskProcessor(config, redisOpt, store)
-	go runGatewayServer(config, store, taskDistributor)
-	runGrpcServer(config, store, taskDistributor)
+	//go runTaskProcessor(config, redisOpt, store)
+	//go runGatewayServer(config, store, taskDistributor)
+	//runGrpcServer(config, store, taskDistributor)
+
+	runGinServer(config, store)
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
